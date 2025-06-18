@@ -18,14 +18,14 @@
  * Copyright (C) 2021 LSPosed Contributors
  */
 
-package de.robv.android.xposed;
+package cn.lony.android.rovox;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.util.HashMap;
 
-import de.robv.android.xposed.callbacks.IXUnhook;
-import de.robv.android.xposed.callbacks.XCallback;
+import cn.lony.android.rovox.callbacks.IXUnhook;
+import cn.lony.android.rovox.callbacks.XCallback;
 
 /**
  * Callback class for method hooks.
@@ -33,12 +33,12 @@ import de.robv.android.xposed.callbacks.XCallback;
  * <p>Usually, anonymous subclasses of this class are created which override
  * {@link #beforeHookedMethod} and/or {@link #afterHookedMethod}.
  */
-public abstract class XC_MethodHook extends XCallback {
+public abstract class RX_MethodHook extends XCallback {
     /**
      * Creates a new callback with default priority.
      */
     @SuppressWarnings("deprecation")
-    public XC_MethodHook() {
+    public RX_MethodHook() {
         super();
     }
 
@@ -52,7 +52,7 @@ public abstract class XC_MethodHook extends XCallback {
      *
      * @param priority See {@link XCallback#priority}.
      */
-    public XC_MethodHook(int priority) {
+    public RX_MethodHook(int priority) {
         super(priority);
     }
 
@@ -181,7 +181,7 @@ public abstract class XC_MethodHook extends XCallback {
     /**
      * An object with which the method/constructor can be unhooked.
      */
-    public class Unhook implements IXUnhook<XC_MethodHook> {
+    public class Unhook implements IXUnhook<RX_MethodHook> {
         private final Member hookMethod;
 
         /*package*/ Unhook(Member hookMethod) {
@@ -196,14 +196,14 @@ public abstract class XC_MethodHook extends XCallback {
         }
 
         @Override
-        public XC_MethodHook getCallback() {
-            return XC_MethodHook.this;
+        public RX_MethodHook getCallback() {
+            return RX_MethodHook.this;
         }
 
         @SuppressWarnings("deprecation")
         @Override
         public void unhook() {
-            XposedBridge.unhookMethod(hookMethod, XC_MethodHook.this);
+            RovoxBridge.unhookMethod(hookMethod, RX_MethodHook.this);
         }
 
     }

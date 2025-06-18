@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import de.robv.android.xposed.XposedBridge;
+import cn.lony.android.rovox.RovoxBridge;
 import io.github.libxposed.api.XposedInterface;
 import io.github.libxposed.api.annotations.AfterInvocation;
 import io.github.libxposed.api.annotations.BeforeInvocation;
@@ -117,7 +117,7 @@ public class LSPosedBridge {
             }
 
             Object[] ctxArray = new Object[modernSnapshot.length];
-            XposedBridge.LegacyApiSupport<T> legacy = null;
+            RovoxBridge.LegacyApiSupport<T> legacy = null;
 
             // call "before method" callbacks
             int beforeIdx;
@@ -147,7 +147,7 @@ public class LSPosedBridge {
 
             if (!callback.isSkipped && legacySnapshot.length != 0) {
                 // TODO: Separate classloader
-                legacy = new XposedBridge.LegacyApiSupport<>(callback, legacySnapshot);
+                legacy = new RovoxBridge.LegacyApiSupport<>(callback, legacySnapshot);
                 legacy.handleBefore();
             }
 

@@ -18,7 +18,7 @@
  * Copyright (C) 2021 LSPosed Contributors
  */
 
-package de.robv.android.xposed.services;
+package cn.lony.android.rovox.services;
 
 import java.io.InputStream;
 

@@ -18,18 +18,18 @@
  * Copyright (C) 2021 LSPosed Contributors
  */
 
-package de.robv.android.xposed;
+package cn.lony.android.rovox;
 
-import de.robv.android.xposed.callbacks.XCallback;
+import cn.lony.android.rovox.callbacks.XCallback;
 
 /**
- * A special case of {@link XC_MethodHook} which completely replaces the original method.
+ * A special case of {@link RX_MethodHook} which completely replaces the original method.
  */
-public abstract class XC_MethodReplacement extends XC_MethodHook {
+public abstract class RX_MethodReplacement extends RX_MethodHook {
     /**
      * Creates a new callback with default priority.
      */
-    public XC_MethodReplacement() {
+    public RX_MethodReplacement() {
         super();
     }
 
@@ -38,7 +38,7 @@ public abstract class XC_MethodReplacement extends XC_MethodHook {
      *
      * @param priority See {@link XCallback#priority}.
      */
-    public XC_MethodReplacement(int priority) {
+    public RX_MethodReplacement(int priority) {
         super(priority);
     }
 
@@ -78,7 +78,7 @@ public abstract class XC_MethodReplacement extends XC_MethodHook {
     /**
      * Predefined callback that skips the method without replacements.
      */
-    public static final XC_MethodReplacement DO_NOTHING = new XC_MethodReplacement(PRIORITY_HIGHEST * 2) {
+    public static final RX_MethodReplacement DO_NOTHING = new RX_MethodReplacement(PRIORITY_HIGHEST * 2) {
         @Override
         protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
             return null;
@@ -90,7 +90,7 @@ public abstract class XC_MethodReplacement extends XC_MethodHook {
      *
      * @param result The value that should be returned to callers of the hooked method.
      */
-    public static XC_MethodReplacement returnConstant(final Object result) {
+    public static RX_MethodReplacement returnConstant(final Object result) {
         return returnConstant(PRIORITY_DEFAULT, result);
     }
 
@@ -100,8 +100,8 @@ public abstract class XC_MethodReplacement extends XC_MethodHook {
      * @param priority See {@link XCallback#priority}.
      * @param result   The value that should be returned to callers of the hooked method.
      */
-    public static XC_MethodReplacement returnConstant(int priority, final Object result) {
-        return new XC_MethodReplacement(priority) {
+    public static RX_MethodReplacement returnConstant(int priority, final Object result) {
+        return new RX_MethodReplacement(priority) {
             @Override
             protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
                 return result;

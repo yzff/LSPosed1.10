@@ -18,14 +18,14 @@
  * Copyright (C) 2021 LSPosed Contributors
  */
 
-package de.robv.android.xposed.services;
+package cn.lony.android.rovox.services;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.robv.android.xposed.SELinuxHelper;
+import cn.lony.android.rovox.SELinuxHelper;
 
 /**
  * General definition of a file access service provided by the Xposed framework.

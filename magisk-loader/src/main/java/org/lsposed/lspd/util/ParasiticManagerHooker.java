@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
+import cn.lony.android.rovox.RX_MethodHook;
+import cn.lony.android.rovox.RX_MethodReplacement;
+import cn.lony.android.rovox.RovoxBridge;
+import cn.lony.android.rovox.RovoxHelpers;
 import hidden.HiddenApiBridge;
 
 public class ParasiticManagerHooker {
@@ -90,8 +90,8 @@ public class ParasiticManagerHooker {
 
     private static void sendBinderToManager(final ClassLoader classLoader, IBinder binder) {
         try {
-            var clazz = XposedHelpers.findClass("org.lsposed.manager.Constants", classLoader);
-            var ok = (boolean) XposedHelpers.callStaticMethod(clazz, "setBinder",
+            var clazz = RovoxHelpers.findClass("org.lsposed.manager.Constants", classLoader);
+            var ok = (boolean) RovoxHelpers.callStaticMethod(clazz, "setBinder",
                     new Class[]{IBinder.class}, binder);
             if (ok) return;
             throw new RuntimeException("setBinder: " + false);
@@ -101,36 +101,36 @@ public class ParasiticManagerHooker {
     }
 
     private static void hookForManager(ILSPManagerService managerService) {
-        var managerApkHooker = new XC_MethodHook() {
+        var managerApkHooker = new RX_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 Hookers.logD("ActivityThread#handleBindApplication() starts");
                 Object bindData = param.args[0];
-                ApplicationInfo appInfo = (ApplicationInfo) XposedHelpers.getObjectField(bindData, "appInfo");
-                XposedHelpers.setObjectField(bindData, "appInfo", getManagerPkgInfo(appInfo).applicationInfo);
+                ApplicationInfo appInfo = (ApplicationInfo) RovoxHelpers.getObjectField(bindData, "appInfo");
+                RovoxHelpers.setObjectField(bindData, "appInfo", getManagerPkgInfo(appInfo).applicationInfo);
             }
         };
-        XposedHelpers.findAndHookMethod(ActivityThread.class,
+        RovoxHelpers.findAndHookMethod(ActivityThread.class,
                 "handleBindApplication",
                 "android.app.ActivityThread$AppBindData",
                 managerApkHooker);
 
-        var unhooks = new XC_MethodHook.Unhook[]{null};
-        unhooks[0] = XposedHelpers.findAndHookMethod(
-                LoadedApk.class, "getClassLoader", new XC_MethodHook() {
+        var unhooks = new RX_MethodHook.Unhook[]{null};
+        unhooks[0] = RovoxHelpers.findAndHookMethod(
+                LoadedApk.class, "getClassLoader", new RX_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) {
                         var pkgInfo = getManagerPkgInfo(null);
-                        if (pkgInfo != null && XposedHelpers.getObjectField(param.thisObject, "mApplicationInfo") == pkgInfo.applicationInfo) {
+                        if (pkgInfo != null && RovoxHelpers.getObjectField(param.thisObject, "mApplicationInfo") == pkgInfo.applicationInfo) {
                             var sSourceDir = pkgInfo.applicationInfo.sourceDir;
                             var pathClassLoader = param.getResult();
 
                             Hookers.logD("LoadedApk getClassLoader " + pathClassLoader);
-                            var pathList = XposedHelpers.getObjectField(pathClassLoader, "pathList");
-                            List<String> lstDexPath = (List<String>)XposedHelpers.callMethod(pathList, "getDexPaths");
+                            var pathList = RovoxHelpers.getObjectField(pathClassLoader, "pathList");
+                            List<String> lstDexPath = (List<String>) RovoxHelpers.callMethod(pathList, "getDexPaths");
                             if (!lstDexPath.contains(sSourceDir)) {
                                 Utils.logW("Could not find manager apk injected in classloader");
-                                XposedHelpers.callMethod(pathClassLoader, "addDexPath", sSourceDir);
+                                RovoxHelpers.callMethod(pathClassLoader, "addDexPath", sSourceDir);
                             }
                             sendBinderToManager((ClassLoader) pathClassLoader, managerService.asBinder());
                             unhooks[0].unhook();
@@ -138,8 +138,8 @@ public class ParasiticManagerHooker {
                     }
                 });
 
-        var activityClientRecordClass = XposedHelpers.findClass("android.app.ActivityThread$ActivityClientRecord", ActivityThread.class.getClassLoader());
-        var activityHooker = new XC_MethodHook() {
+        var activityClientRecordClass = RovoxHelpers.findClass("android.app.ActivityThread$ActivityClientRecord", ActivityThread.class.getClassLoader());
+        var activityHooker = new RX_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 for (var i = 0; i < param.args.length; ++i) {
@@ -191,24 +191,24 @@ public class ParasiticManagerHooker {
                         var aInfo = (ActivityInfo) param.args[i];
                         Hookers.logD("loading state of " + aInfo.name);
                         states.computeIfPresent(aInfo.name, (k, v) -> {
-                            XposedHelpers.setObjectField(param.thisObject, "state", v);
+                            RovoxHelpers.setObjectField(param.thisObject, "state", v);
                             return v;
                         });
                         persistentStates.computeIfPresent(aInfo.name, (k, v) -> {
-                            XposedHelpers.setObjectField(param.thisObject, "persistentState", v);
+                            RovoxHelpers.setObjectField(param.thisObject, "persistentState", v);
                             return v;
                         });
                     }
                 }
             }
         };
-        XposedBridge.hookAllConstructors(activityClientRecordClass, activityHooker);
+        RovoxBridge.hookAllConstructors(activityClientRecordClass, activityHooker);
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1) {
-            XposedBridge.hookAllMethods(XposedHelpers.findClass("android.app.ActivityThread$ApplicationThread", ActivityThread.class.getClassLoader()), "scheduleLaunchActivity", activityHooker);
+            RovoxBridge.hookAllMethods(RovoxHelpers.findClass("android.app.ActivityThread$ApplicationThread", ActivityThread.class.getClassLoader()), "scheduleLaunchActivity", activityHooker);
         }
 
-        XposedBridge.hookAllMethods(ActivityThread.class, "handleReceiver", new XC_MethodReplacement() {
+        RovoxBridge.hookAllMethods(ActivityThread.class, "handleReceiver", new RX_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam param) {
                 for (var arg : param.args) {
@@ -220,7 +220,7 @@ public class ParasiticManagerHooker {
             }
         });
 
-        XposedBridge.hookAllMethods(ActivityThread.class, "installProvider", new XC_MethodHook() {
+        RovoxBridge.hookAllMethods(ActivityThread.class, "installProvider", new RX_MethodHook() {
             private Context originalContext = null;
 
             @Override
@@ -243,8 +243,8 @@ public class ParasiticManagerHooker {
                     if (originalContext == null) {
                         info.applicationInfo.packageName = packageName + ".origin";
                         var originalPkgInfo = ActivityThread.currentActivityThread().getPackageInfoNoCheck(info.applicationInfo, HiddenApiBridge.Resources_getCompatibilityInfo(ctx.getResources()));
-                        XposedHelpers.setObjectField(originalPkgInfo, "mPackageName", packageName);
-                        originalContext = (Context) XposedHelpers.callStaticMethod(XposedHelpers.findClass("android.app.ContextImpl", null),
+                        RovoxHelpers.setObjectField(originalPkgInfo, "mPackageName", packageName);
+                        originalContext = (Context) RovoxHelpers.callStaticMethod(RovoxHelpers.findClass("android.app.ContextImpl", null),
                                 "createAppContext", ActivityThread.currentActivityThread(), originalPkgInfo);
                         info.applicationInfo.packageName = packageName;
                     }
@@ -255,13 +255,13 @@ public class ParasiticManagerHooker {
             }
         });
 
-        XposedHelpers.findAndHookMethod(WebViewFactory.class, "getProvider", new XC_MethodReplacement() {
+        RovoxHelpers.findAndHookMethod(WebViewFactory.class, "getProvider", new RX_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam param) {
-                var sProviderInstance = XposedHelpers.getStaticObjectField(WebViewFactory.class, "sProviderInstance");
+                var sProviderInstance = RovoxHelpers.getStaticObjectField(WebViewFactory.class, "sProviderInstance");
                 if (sProviderInstance != null) return sProviderInstance;
                 //noinspection unchecked
-                var providerClass = (Class<WebViewFactoryProvider>) XposedHelpers.callStaticMethod(WebViewFactory.class, "getProviderClass");
+                var providerClass = (Class<WebViewFactoryProvider>) RovoxHelpers.callStaticMethod(WebViewFactory.class, "getProviderClass");
                 Method staticFactory = null;
                 try {
                     staticFactory = providerClass.getMethod(
@@ -276,7 +276,7 @@ public class ParasiticManagerHooker {
                     if (staticFactory != null) {
                         sProviderInstance = staticFactory.invoke(null, webViewDelegateConstructor.newInstance());
                     }
-                    XposedHelpers.setStaticObjectField(WebViewFactory.class, "sProviderInstance", sProviderInstance);
+                    RovoxHelpers.setStaticObjectField(WebViewFactory.class, "sProviderInstance", sProviderInstance);
                     Hookers.logD("Loaded provider: " + sProviderInstance);
                     return sProviderInstance;
                 } catch (Exception e) {
@@ -285,19 +285,19 @@ public class ParasiticManagerHooker {
                 }
             }
         });
-        var stateHooker = new XC_MethodHook() {
+        var stateHooker = new RX_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 try {
                     var record = param.args[0];
                     if (record instanceof IBinder) {
-                        record = ((ArrayMap<?, ?>) XposedHelpers.getObjectField(param.thisObject, "mActivities")).get(record);
+                        record = ((ArrayMap<?, ?>) RovoxHelpers.getObjectField(param.thisObject, "mActivities")).get(record);
                         if (record == null) return;
                     }
-                    XposedHelpers.callMethod(param.thisObject, Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? "callActivityOnSaveInstanceState" : "callCallActivityOnSaveInstanceState", record);
-                    var state = (Bundle) XposedHelpers.getObjectField(record, "state");
-                    var persistentState = (PersistableBundle) XposedHelpers.getObjectField(record, "persistentState");
-                    var aInfo = (ActivityInfo) XposedHelpers.getObjectField(record, "activityInfo");
+                    RovoxHelpers.callMethod(param.thisObject, Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? "callActivityOnSaveInstanceState" : "callCallActivityOnSaveInstanceState", record);
+                    var state = (Bundle) RovoxHelpers.getObjectField(record, "state");
+                    var persistentState = (PersistableBundle) RovoxHelpers.getObjectField(record, "persistentState");
+                    var aInfo = (ActivityInfo) RovoxHelpers.getObjectField(record, "activityInfo");
                     states.compute(aInfo.name, (k, v) -> state);
                     persistentStates.compute(aInfo.name, (k, v) -> persistentState);
                     Hookers.logD("saving state of " + aInfo.name);
@@ -306,9 +306,9 @@ public class ParasiticManagerHooker {
                 }
             }
         };
-        XposedBridge.hookAllMethods(ActivityThread.class, "performStopActivityInner", stateHooker);
+        RovoxBridge.hookAllMethods(ActivityThread.class, "performStopActivityInner", stateHooker);
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O_MR1)
-            XposedHelpers.findAndHookMethod(ActivityThread.class, "performDestroyActivity", IBinder.class, boolean.class, int.class, boolean.class, stateHooker);
+            RovoxHelpers.findAndHookMethod(ActivityThread.class, "performDestroyActivity", IBinder.class, boolean.class, int.class, boolean.class, stateHooker);
     }
 
 

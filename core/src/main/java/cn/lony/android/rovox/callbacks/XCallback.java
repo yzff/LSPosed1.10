@@ -18,7 +18,7 @@
  * Copyright (C) 2021 LSPosed Contributors
  */
 
-package de.robv.android.xposed.callbacks;
+package cn.lony.android.rovox.callbacks;
 
 import android.os.Bundle;
 
@@ -26,7 +26,7 @@ import org.lsposed.lspd.deopt.PrebuiltMethodsDeopter;
 
 import java.io.Serializable;
 
-import de.robv.android.xposed.XposedBridge;
+import cn.lony.android.rovox.RovoxBridge;
 
 /**
  * Base class for Xposed callbacks.
@@ -133,10 +133,10 @@ abstract public class XCallback {
      */
     public static void callAll(Param param) {
 
-        if (param instanceof XC_LoadPackage.LoadPackageParam) {
+        if (param instanceof RX_LoadPackage.LoadPackageParam) {
             // deopt methods in system apps or priv-apps, this would be not necessary
             // only if we found out how to recompile their apks
-            XC_LoadPackage.LoadPackageParam lpp = (XC_LoadPackage.LoadPackageParam) param;
+            RX_LoadPackage.LoadPackageParam lpp = (RX_LoadPackage.LoadPackageParam) param;
             PrebuiltMethodsDeopter.deoptMethods(lpp.packageName, lpp.classLoader);
         }
 
@@ -147,7 +147,7 @@ abstract public class XCallback {
             try {
                 param.callbacks[i].call(param);
             } catch (Throwable t) {
-                XposedBridge.log(t);
+                RovoxBridge.log(t);
             }
         }
     }

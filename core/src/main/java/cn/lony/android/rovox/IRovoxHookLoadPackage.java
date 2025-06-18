@@ -1,9 +1,9 @@
-package de.robv.android.xposed;
+package cn.lony.android.rovox;
 
 import android.app.Application;
 
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
+import cn.lony.android.rovox.callbacks.RX_LoadPackage;
+import cn.lony.android.rovox.callbacks.RX_LoadPackage.LoadPackageParam;
 
 /**
  * Get notified when an app ("Android package") is loaded.
@@ -12,7 +12,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
  * <p>This interface should be implemented by the module's main class. Xposed will take care of
  * registering it as a callback automatically.
  */
-public interface IXposedHookLoadPackage extends IXposedMod {
+public interface IRovoxHookLoadPackage extends IRovoxMod {
     /**
      * This method is called when an app is loaded. It's called very early, even before
      * {@link Application#onCreate} is called.
@@ -24,9 +24,9 @@ public interface IXposedHookLoadPackage extends IXposedMod {
     void handleLoadPackage(LoadPackageParam lpparam) throws Throwable;
 
     /** @hide */
-    final class Wrapper extends XC_LoadPackage {
-        private final IXposedHookLoadPackage instance;
-        public Wrapper(IXposedHookLoadPackage instance) {
+    final class Wrapper extends RX_LoadPackage {
+        private final IRovoxHookLoadPackage instance;
+        public Wrapper(IRovoxHookLoadPackage instance) {
             this.instance = instance;
         }
         @Override

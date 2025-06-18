@@ -21,12 +21,12 @@
 package android.content.res;
 
 import static org.lsposed.lspd.nativebridge.ResourcesHook.rewriteXmlReferencesNative;
-import static de.robv.android.xposed.XposedHelpers.decrementMethodDepth;
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-import static de.robv.android.xposed.XposedHelpers.getBooleanField;
-import static de.robv.android.xposed.XposedHelpers.getLongField;
-import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.incrementMethodDepth;
+import static cn.lony.android.rovox.RovoxHelpers.decrementMethodDepth;
+import static cn.lony.android.rovox.RovoxHelpers.findAndHookMethod;
+import static cn.lony.android.rovox.RovoxHelpers.getBooleanField;
+import static cn.lony.android.rovox.RovoxHelpers.getLongField;
+import static cn.lony.android.rovox.RovoxHelpers.getObjectField;
+import static cn.lony.android.rovox.RovoxHelpers.incrementMethodDepth;
 
 import android.content.Context;
 import android.content.pm.PackageParser;
@@ -58,15 +58,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.WeakHashMap;
 
-import de.robv.android.xposed.IXposedHookZygoteInit;
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodHook.MethodHookParam;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedBridge.CopyOnWriteSortedSet;
-import de.robv.android.xposed.XposedInit;
-import de.robv.android.xposed.callbacks.XC_LayoutInflated;
-import de.robv.android.xposed.callbacks.XC_LayoutInflated.LayoutInflatedParam;
-import de.robv.android.xposed.callbacks.XCallback;
+import cn.lony.android.rovox.IRovoxHookZygoteInit;
+import cn.lony.android.rovox.RX_MethodHook;
+import cn.lony.android.rovox.RX_MethodHook.MethodHookParam;
+import cn.lony.android.rovox.RovoxBridge;
+import cn.lony.android.rovox.RovoxBridge.CopyOnWriteSortedSet;
+import cn.lony.android.rovox.RovoxInit;
+import cn.lony.android.rovox.callbacks.RX_LayoutInflated;
+import cn.lony.android.rovox.callbacks.RX_LayoutInflated.LayoutInflatedParam;
+import cn.lony.android.rovox.callbacks.XCallback;
 import xposed.dummy.XResourcesSuperClass;
 import xposed.dummy.XTypedArraySuperClass;
 
@@ -91,8 +91,8 @@ public class XResources extends XResourcesSuperClass {
 	private static final HashMap<String, byte[]> sReplacementsCacheMap = new HashMap<>();
 	private static final SparseArray<ColorStateList> sColorStateListCache = new SparseArray<>(0);
 
-	private static final SparseArray<HashMap<String, CopyOnWriteSortedSet<XC_LayoutInflated>>> sLayoutCallbacks = new SparseArray<>();
-	private static final WeakHashMap<XmlResourceParser, XMLInstanceDetails> sXmlInstanceDetails = new WeakHashMap<>();
+	private static final SparseArray<HashMap<String, CopyOnWriteSortedSet<RX_LayoutInflated>>> sLayoutCallbacks    = new SparseArray<>();
+	private static final WeakHashMap<XmlResourceParser, XMLInstanceDetails>                    sXmlInstanceDetails = new WeakHashMap<>();
 
 	private static final String EXTRA_XML_INSTANCE_DETAILS = "xmlInstanceDetails";
 	private static final ThreadLocal<LinkedList<MethodHookParam>> sIncludedLayouts = ThreadLocal.withInitial(() -> new LinkedList<>());
@@ -216,7 +216,7 @@ public class XResources extends XResourcesSuperClass {
 	public static void init(ThreadLocal<Object> latestResKey) throws Exception {
 		sLatestResKey = latestResKey;
 
-		findAndHookMethod(LayoutInflater.class, "inflate", XmlPullParser.class, ViewGroup.class, boolean.class, new XC_MethodHook() {
+		findAndHookMethod(LayoutInflater.class, "inflate", XmlPullParser.class, ViewGroup.class, boolean.class, new RX_MethodHook() {
 			@Override
 			protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 				if (param.hasThrowable())
@@ -237,7 +237,7 @@ public class XResources extends XResourcesSuperClass {
 			}
 		});
 
-		final XC_MethodHook parseIncludeHook = new XC_MethodHook() {
+		final RX_MethodHook parseIncludeHook = new RX_MethodHook() {
 			@Override
 			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
 				sIncludedLayouts.get().push(param);
@@ -543,7 +543,7 @@ public class XResources extends XResourcesSuperClass {
 	 * <p>Some resources are part of the Android framework and can be used in any app. They're
 	 * accessible via {@link android.R android.R} and are not bound to a specific
 	 * {@link android.content.res.Resources} instance. Such resources can be replaced in
-	 * {@link IXposedHookZygoteInit#initZygote initZygote()} for all apps. As there is no
+	 * {@link IRovoxHookZygoteInit#initZygote initZygote()} for all apps. As there is no
 	 * {@link XResources} object easily available in that scope, this static method can be used
 	 * to set resource replacements. All other details (e.g. how certain types can be replaced) are
 	 * mentioned in {@link #setReplacement(String, String, String, Object)}.
@@ -567,7 +567,7 @@ public class XResources extends XResourcesSuperClass {
 		String resDir = (res != null) ? res.mResDir : null;
 		if (res == null) {
 			try {
-				XposedInit.hookResources();
+				RovoxInit.hookResources();
 			} catch (Throwable throwable) {
 				throw new IllegalStateException("Failed to initialize resources hook");
 			}
@@ -764,7 +764,7 @@ public class XResources extends XResourcesSuperClass {
 						Drawable result = ((DrawableLoader) replacement).newDrawable(this, id);
 						if (result != null)
 							return result;
-					} catch (Throwable t) { XposedBridge.log(t); }
+					} catch (Throwable t) { RovoxBridge.log(t); }
 				} else if (replacement instanceof Integer) {
 					return new ColorDrawable((Integer) replacement);
 				} else if (replacement instanceof XResForwarder) {
@@ -790,7 +790,7 @@ public class XResources extends XResourcesSuperClass {
 						Drawable result = ((DrawableLoader) replacement).newDrawable(this, id);
 						if (result != null)
 							return result;
-					} catch (Throwable t) { XposedBridge.log(t); }
+					} catch (Throwable t) { RovoxBridge.log(t); }
 				} else if (replacement instanceof Integer) {
 					return new ColorDrawable((Integer) replacement);
 				} else if (replacement instanceof XResForwarder) {
@@ -816,7 +816,7 @@ public class XResources extends XResourcesSuperClass {
 						Drawable result = ((DrawableLoader) replacement).newDrawableForDensity(this, id, density);
 						if (result != null)
 							return result;
-					} catch (Throwable t) { XposedBridge.log(t); }
+					} catch (Throwable t) { RovoxBridge.log(t); }
 				} else if (replacement instanceof Integer) {
 					return new ColorDrawable((Integer) replacement);
 				} else if (replacement instanceof XResForwarder) {
@@ -842,7 +842,7 @@ public class XResources extends XResourcesSuperClass {
 						Drawable result = ((DrawableLoader) replacement).newDrawableForDensity(this, id, density);
 						if (result != null)
 							return result;
-					} catch (Throwable t) { XposedBridge.log(t); }
+					} catch (Throwable t) { RovoxBridge.log(t); }
 				} else if (replacement instanceof Integer) {
 					return new ColorDrawable((Integer) replacement);
 				} else if (replacement instanceof XResForwarder) {
@@ -947,12 +947,12 @@ public class XResources extends XResourcesSuperClass {
 		}
 
 		// Check whether this layout is hooked
-		HashMap<String, CopyOnWriteSortedSet<XC_LayoutInflated>> inner;
+		HashMap<String, CopyOnWriteSortedSet<RX_LayoutInflated>> inner;
 		synchronized (sLayoutCallbacks) {
 			inner = sLayoutCallbacks.get(id);
 		}
 		if (inner != null) {
-			CopyOnWriteSortedSet<XC_LayoutInflated> callbacks;
+			CopyOnWriteSortedSet<RX_LayoutInflated> callbacks;
 			synchronized (inner) {
 				callbacks = inner.get(mResDir);
 				if (callbacks == null && mResDir != null)
@@ -967,10 +967,10 @@ public class XResources extends XResourcesSuperClass {
 					if (components.length == 3)
 						variant = components[1];
 					else
-						XposedBridge.log("Unexpected resource path \"" + value.string.toString()
+						RovoxBridge.log("Unexpected resource path \"" + value.string.toString()
 								+ "\" for resource id 0x" + Integer.toHexString(id));
 				} else {
-					XposedBridge.log(new NotFoundException("Could not find file name for resource id 0x") + Integer.toHexString(id));
+					RovoxBridge.log(new NotFoundException("Could not find file name for resource id 0x") + Integer.toHexString(id));
 				}
 
 				synchronized (sXmlInstanceDetails) {
@@ -1091,7 +1091,7 @@ public class XResources extends XResourcesSuperClass {
 			repRes.getValue(repId, outValue, resolveRefs);
 		} else {
 			if (replacement != null) {
-				XposedBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
+				RovoxBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
 			}
 			super.getValue(id, outValue, resolveRefs);
 		}
@@ -1107,7 +1107,7 @@ public class XResources extends XResourcesSuperClass {
 			repRes.getValueForDensity(repId, density, outValue, resolveRefs);
 		} else {
 			if (replacement != null) {
-				XposedBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
+				RovoxBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
 			}
 			super.getValueForDensity(id, density, outValue, resolveRefs);
 		}
@@ -1174,7 +1174,7 @@ public class XResources extends XResourcesSuperClass {
 			} catch (NotFoundException ignored) {}
 
 			if (!repResDefined && origResId == 0 && !entryType.equals("id")) {
-				XposedBridge.log(entryType + "/" + entryName + " is neither defined in module nor in original resources");
+				RovoxBridge.log(entryType + "/" + entryName + " is neither defined in module nor in original resources");
 				return 0;
 			}
 
@@ -1188,7 +1188,7 @@ public class XResources extends XResourcesSuperClass {
 
 			return origResId;
 		} catch (Exception e) {
-			XposedBridge.log(e);
+			RovoxBridge.log(e);
 			return id;
 		}
 	}
@@ -1255,7 +1255,7 @@ public class XResources extends XResourcesSuperClass {
 		try {
 			origAttrId = origRes.getIdentifier(attrName, "attr", origPackage);
 		} catch (NotFoundException e) {
-			XposedBridge.log("Attribute " + attrName + " not found in original resources");
+			RovoxBridge.log("Attribute " + attrName + " not found in original resources");
 		}
 		return origAttrId;
 	}
@@ -1372,7 +1372,7 @@ public class XResources extends XResourcesSuperClass {
 					Drawable result = ((DrawableLoader) replacement).newDrawable(xres, resId);
 					if (result != null)
 						return result;
-				} catch (Throwable t) { XposedBridge.log(t); }
+				} catch (Throwable t) { RovoxBridge.log(t); }
 			} else if (replacement instanceof Integer) {
 				return new ColorDrawable((Integer) replacement);
 			} else if (replacement instanceof XResForwarder) {
@@ -1518,7 +1518,7 @@ public class XResources extends XResourcesSuperClass {
 				return outValue.type != TypedValue.TYPE_NULL;
 			} else {
 				if (replacement != null) {
-					XposedBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
+					RovoxBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
 				}
 				return super.getValue(index, outValue);
 			}
@@ -1539,7 +1539,7 @@ public class XResources extends XResourcesSuperClass {
 				return value;
 			} else {
 				if (replacement != null) {
-					XposedBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
+					RovoxBridge.log("Replacement of resource ID #0x" + Integer.toHexString(id) + " escaped because of deprecated replacement. Please use XResForwarder instead.");
 				}
 				return super.peekValue(index);
 			}
@@ -1641,11 +1641,11 @@ public class XResources extends XResourcesSuperClass {
 
 	private class XMLInstanceDetails {
 		public final ResourceNames resNames;
-		public final String variant;
-		public final CopyOnWriteSortedSet<XC_LayoutInflated> callbacks;
-		public final XResources res = XResources.this;
+		public final String                                  variant;
+		public final CopyOnWriteSortedSet<RX_LayoutInflated> callbacks;
+		public final XResources                              res = XResources.this;
 
-		private XMLInstanceDetails(ResourceNames resNames, String variant, CopyOnWriteSortedSet<XC_LayoutInflated> callbacks) {
+		private XMLInstanceDetails(ResourceNames resNames, String variant, CopyOnWriteSortedSet<RX_LayoutInflated> callbacks) {
 			this.resNames = resNames;
 			this.variant = variant;
 			this.callbacks = callbacks;
@@ -1659,14 +1659,14 @@ public class XResources extends XResourcesSuperClass {
 	 * @param callback The callback to be executed when the layout has been inflated.
 	 * @return An object which can be used to remove the callback again.
 	 */
-	public XC_LayoutInflated.Unhook hookLayout(int id, XC_LayoutInflated callback) {
+	public RX_LayoutInflated.Unhook hookLayout(int id, RX_LayoutInflated callback) {
 		return hookLayoutInternal(mResDir, id, getResourceNames(id), callback);
 	}
 
 	/**
 	 * Hook the inflation of a layout.
 	 *
-	 * @deprecated Use {@link #hookLayout(String, String, String, XC_LayoutInflated)} instead.
+	 * @deprecated Use {@link #hookLayout(String, String, String, RX_LayoutInflated)} instead.
 	 *
 	 * @param fullName The full resource name, e.g. {@code com.android.systemui:layout/statusbar}.
 	 *                 See {@link #getResourceName}.
@@ -1674,7 +1674,7 @@ public class XResources extends XResourcesSuperClass {
 	 * @return An object which can be used to remove the callback again.
 	 */
 	@Deprecated
-	public XC_LayoutInflated.Unhook hookLayout(String fullName, XC_LayoutInflated callback) {
+	public RX_LayoutInflated.Unhook hookLayout(String fullName, RX_LayoutInflated callback) {
 		int id = getIdentifier(fullName, null, null);
 		if (id == 0)
 			throw new NotFoundException(fullName);
@@ -1693,7 +1693,7 @@ public class XResources extends XResourcesSuperClass {
 	 * @param callback The callback to be executed when the layout has been inflated.
 	 * @return An object which can be used to remove the callback again.
 	 */
-	public XC_LayoutInflated.Unhook hookLayout(String pkg, String type, String name, XC_LayoutInflated callback) {
+	public RX_LayoutInflated.Unhook hookLayout(String pkg, String type, String name, RX_LayoutInflated callback) {
 		int id = getIdentifier(name, type, pkg);
 		if (id == 0)
 			throw new NotFoundException(pkg + ":" + type + "/" + name);
@@ -1702,13 +1702,13 @@ public class XResources extends XResourcesSuperClass {
 
 	/**
 	 * Hook the inflation of an Android framework layout (in the {@code android} package).
-	 * See {@link #hookSystemWideLayout(String, String, String, XC_LayoutInflated)}.
+	 * See {@link #hookSystemWideLayout(String, String, String, RX_LayoutInflated)}.
 	 *
 	 * @param id The ID of the resource which should be replaced.
 	 * @param callback The callback to be executed when the layout has been inflated.
 	 * @return An object which can be used to remove the callback again.
 	 */
-	public static XC_LayoutInflated.Unhook hookSystemWideLayout(int id, XC_LayoutInflated callback) {
+	public static RX_LayoutInflated.Unhook hookSystemWideLayout(int id, RX_LayoutInflated callback) {
 		if (id >= 0x7f000000)
 			throw new IllegalArgumentException("ids >= 0x7f000000 are app specific and cannot be set for the framework");
 		return hookLayoutInternal(null, id, getSystemResourceNames(id), callback);
@@ -1716,9 +1716,9 @@ public class XResources extends XResourcesSuperClass {
 
 	/**
 	 * Hook the inflation of an Android framework layout (in the {@code android} package).
-	 * See {@link #hookSystemWideLayout(String, String, String, XC_LayoutInflated)}.
+	 * See {@link #hookSystemWideLayout(String, String, String, RX_LayoutInflated)}.
 	 *
-	 * @deprecated Use {@link #hookSystemWideLayout(String, String, String, XC_LayoutInflated)} instead.
+	 * @deprecated Use {@link #hookSystemWideLayout(String, String, String, RX_LayoutInflated)} instead.
 	 *
 	 * @param fullName The full resource name, e.g. {@code android:layout/simple_list_item_1}.
 	 *                 See {@link #getResourceName}.
@@ -1726,7 +1726,7 @@ public class XResources extends XResourcesSuperClass {
 	 * @return An object which can be used to remove the callback again.
 	 */
 	@Deprecated
-	public static XC_LayoutInflated.Unhook hookSystemWideLayout(String fullName, XC_LayoutInflated callback) {
+	public static RX_LayoutInflated.Unhook hookSystemWideLayout(String fullName, RX_LayoutInflated callback) {
 		int id = getSystem().getIdentifier(fullName, null, null);
 		if (id == 0)
 			throw new NotFoundException(fullName);
@@ -1739,7 +1739,7 @@ public class XResources extends XResourcesSuperClass {
 	 * <p>Some layouts are part of the Android framework and can be used in any app. They're
 	 * accessible via {@link android.R.layout android.R.layout} and are not bound to a specific
 	 * {@link android.content.res.Resources} instance. Such resources can be replaced in
-	 * {@link IXposedHookZygoteInit#initZygote initZygote()} for all apps. As there is no
+	 * {@link IRovoxHookZygoteInit#initZygote initZygote()} for all apps. As there is no
 	 * {@link XResources} object easily available in that scope, this static method can be used
 	 * to hook layouts.
 	 *
@@ -1752,26 +1752,26 @@ public class XResources extends XResourcesSuperClass {
 	 * @param callback The callback to be executed when the layout has been inflated.
 	 * @return An object which can be used to remove the callback again.
 	 */
-	public static XC_LayoutInflated.Unhook hookSystemWideLayout(String pkg, String type, String name, XC_LayoutInflated callback) {
+	public static RX_LayoutInflated.Unhook hookSystemWideLayout(String pkg, String type, String name, RX_LayoutInflated callback) {
 		int id = getSystem().getIdentifier(name, type, pkg);
 		if (id == 0)
 			throw new NotFoundException(pkg + ":" + type + "/" + name);
 		return hookSystemWideLayout(id, callback);
 	}
 
-	private static XC_LayoutInflated.Unhook hookLayoutInternal(String resDir, int id, ResourceNames resNames, XC_LayoutInflated callback) {
+	private static RX_LayoutInflated.Unhook hookLayoutInternal(String resDir, int id, ResourceNames resNames, RX_LayoutInflated callback) {
 		if (id == 0)
 			throw new IllegalArgumentException("id 0 is not an allowed resource identifier");
 
 		if (resDir == null) {
 			try {
-				XposedInit.hookResources();
+				RovoxInit.hookResources();
 			} catch (Throwable throwable) {
 				throw new IllegalStateException("Failed to initialize resources hook", throwable);
 			}
 		}
 
-		HashMap<String, CopyOnWriteSortedSet<XC_LayoutInflated>> inner;
+		HashMap<String, CopyOnWriteSortedSet<RX_LayoutInflated>> inner;
 		synchronized (sLayoutCallbacks) {
 			inner = sLayoutCallbacks.get(id);
 			if (inner == null) {
@@ -1780,7 +1780,7 @@ public class XResources extends XResourcesSuperClass {
 			}
 		}
 
-		CopyOnWriteSortedSet<XC_LayoutInflated> callbacks;
+		CopyOnWriteSortedSet<RX_LayoutInflated> callbacks;
 		synchronized (inner) {
 			callbacks = inner.get(resDir);
 			if (callbacks == null) {
@@ -1797,15 +1797,15 @@ public class XResources extends XResourcesSuperClass {
 	}
 
 	/** @hide */
-	public static void unhookLayout(String resDir, int id, XC_LayoutInflated callback) {
-		HashMap<String, CopyOnWriteSortedSet<XC_LayoutInflated>> inner;
+	public static void unhookLayout(String resDir, int id, RX_LayoutInflated callback) {
+		HashMap<String, CopyOnWriteSortedSet<RX_LayoutInflated>> inner;
 		synchronized (sLayoutCallbacks) {
 			inner = sLayoutCallbacks.get(id);
 			if (inner == null)
 				return;
 		}
 
-		CopyOnWriteSortedSet<XC_LayoutInflated> callbacks;
+		CopyOnWriteSortedSet<RX_LayoutInflated> callbacks;
 		synchronized (inner) {
 			callbacks = inner.get(resDir);
 			if (callbacks == null)

@@ -18,24 +18,24 @@
  * Copyright (C) 2021 LSPosed Contributors
  */
 
-package de.robv.android.xposed.callbacks;
+package cn.lony.android.rovox.callbacks;
 
 import android.content.res.XResources;
 import android.content.res.XResources.ResourceNames;
 import android.view.View;
 
-import de.robv.android.xposed.XposedBridge.CopyOnWriteSortedSet;
+import cn.lony.android.rovox.RovoxBridge.CopyOnWriteSortedSet;
 
 /**
  * Callback for hooking layouts. Such callbacks can be passed to {@link XResources#hookLayout}
  * and its variants.
  */
-public abstract class XC_LayoutInflated extends XCallback implements Comparable<XC_LayoutInflated> {
+public abstract class RX_LayoutInflated extends XCallback implements Comparable<RX_LayoutInflated> {
     /**
      * Creates a new callback with default priority.
      */
     @SuppressWarnings("deprecation")
-    public XC_LayoutInflated() {
+    public RX_LayoutInflated() {
         super();
     }
 
@@ -44,7 +44,7 @@ public abstract class XC_LayoutInflated extends XCallback implements Comparable<
      *
      * @param priority See {@link XCallback#priority}.
      */
-    public XC_LayoutInflated(int priority) {
+    public RX_LayoutInflated(int priority) {
         super(priority);
     }
 
@@ -55,7 +55,7 @@ public abstract class XC_LayoutInflated extends XCallback implements Comparable<
         /**
          * @hide
          */
-        public LayoutInflatedParam(CopyOnWriteSortedSet<XC_LayoutInflated> callbacks) {
+        public LayoutInflatedParam(CopyOnWriteSortedSet<RX_LayoutInflated> callbacks) {
             super(callbacks.getSnapshot(new XCallback[0]));
         }
 
@@ -82,7 +82,7 @@ public abstract class XC_LayoutInflated extends XCallback implements Comparable<
 
     /** @hide */
     @Override
-    public int compareTo(XC_LayoutInflated other) {
+    public int compareTo(RX_LayoutInflated other) {
         if (this == other)
             return 0;
 
@@ -116,7 +116,7 @@ public abstract class XC_LayoutInflated extends XCallback implements Comparable<
     /**
      * An object with which the callback can be removed.
      */
-    public class Unhook implements IXUnhook<XC_LayoutInflated> {
+    public class Unhook implements IXUnhook<RX_LayoutInflated> {
         private final String resDir;
         private final int id;
 
@@ -136,13 +136,13 @@ public abstract class XC_LayoutInflated extends XCallback implements Comparable<
         }
 
         @Override
-        public XC_LayoutInflated getCallback() {
-            return XC_LayoutInflated.this;
+        public RX_LayoutInflated getCallback() {
+            return RX_LayoutInflated.this;
         }
 
         @Override
         public void unhook() {
-            XResources.unhookLayout(resDir, id, XC_LayoutInflated.this);
+            XResources.unhookLayout(resDir, id, RX_LayoutInflated.this);
         }
 
     }

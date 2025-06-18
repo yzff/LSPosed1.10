@@ -18,10 +18,10 @@
  * Copyright (C) 2021 LSPosed Contributors
  */
 
-package de.robv.android.xposed;
+package cn.lony.android.rovox;
 
 /**
  * Marker interface for Xposed modules. Cannot be implemented directly.
  */
-/* package */ interface IXposedMod {
+/* package */ interface IRovoxMod {
 }

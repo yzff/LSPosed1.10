@@ -18,31 +18,26 @@
  * Copyright (C) 2021 LSPosed Contributors
  */
 
-package de.robv.android.xposed.callbacks;
+package cn.lony.android.rovox.callbacks;
 
-import android.content.res.XResources;
-import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.content.pm.ApplicationInfo;
 
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import de.robv.android.xposed.IXposedHookInitPackageResources;
-import io.github.libxposed.api.XposedModuleInterface;
+import cn.lony.android.rovox.IRovoxHookLoadPackage;
 
 /**
- * This class is only used for internal purposes, except for the {@link InitPackageResourcesParam}
+ * This class is only used for internal purposes, except for the {@link LoadPackageParam}
  * subclass.
  */
-public abstract class XC_InitPackageResources extends XCallback implements IXposedHookInitPackageResources {
+public abstract class RX_LoadPackage extends XCallback implements IRovoxHookLoadPackage {
     /**
      * Creates a new callback with default priority.
      *
      * @hide
      */
     @SuppressWarnings("deprecation")
-    public XC_InitPackageResources() {
+    public RX_LoadPackage() {
         super();
     }
 
@@ -52,31 +47,45 @@ public abstract class XC_InitPackageResources extends XCallback implements IXpos
      * @param priority See {@link XCallback#priority}.
      * @hide
      */
-    public XC_InitPackageResources(int priority) {
+    public RX_LoadPackage(int priority) {
         super(priority);
     }
 
     /**
-     * Wraps information about the resources being initialized.
+     * Wraps information about the app being loaded.
      */
-    public static final class InitPackageResourcesParam extends XCallback.Param {
+    public static final class LoadPackageParam extends XCallback.Param {
         /**
          * @hide
          */
-        public InitPackageResourcesParam(CopyOnWriteArraySet<XC_InitPackageResources> callbacks) {
+        public LoadPackageParam(CopyOnWriteArraySet<RX_LoadPackage> callbacks) {
             super(callbacks.toArray(new XCallback[0]));
         }
 
         /**
-         * The name of the package for which resources are being loaded.
+         * The name of the package being loaded.
          */
         public String packageName;
 
         /**
-         * Reference to the resources that can be used for calls to
-         * {@link XResources#setReplacement(String, String, String, Object)}.
+         * The process in which the package is executed.
          */
-        public XResources res;
+        public String processName;
+
+        /**
+         * The ClassLoader used for this package.
+         */
+        public ClassLoader classLoader;
+
+        /**
+         * More information about the application being loaded.
+         */
+        public ApplicationInfo appInfo;
+
+        /**
+         * Set to {@code true} if this is the first (and main) application for this process.
+         */
+        public boolean isFirstApplication;
     }
 
     /**
@@ -84,7 +93,7 @@ public abstract class XC_InitPackageResources extends XCallback implements IXpos
      */
     @Override
     protected void call(Param param) throws Throwable {
-        if (param instanceof InitPackageResourcesParam)
-            handleInitPackageResources((InitPackageResourcesParam) param);
+        if (param instanceof LoadPackageParam)
+            handleLoadPackage((LoadPackageParam) param);
     }
 }
