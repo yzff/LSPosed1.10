@@ -127,7 +127,7 @@ public class MainActivity extends BaseActivity implements RepoLoader.RepoListene
                     case "logs" -> nav.setSelectedItemId(R.id.logs_fragment);
                     case "repo" -> {
                         if (ConfigManager.isMagiskInstalled()) {
-                            nav.setSelectedItemId(R.id.repo_nav);
+                            //nav.setSelectedItemId(R.id.repo_nav);
                         }
                     }
                     case "settings" -> nav.setSelectedItemId(R.id.settings_fragment);

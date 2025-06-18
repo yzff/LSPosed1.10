@@ -169,7 +169,7 @@ public class LSPManagerService extends ILSPManagerService.Stub {
 
     @SuppressLint("WrongConstant")
     public static void broadcastIntent(Intent inIntent) {
-        var intent = new Intent("org.lsposed.manager.NOTIFICATION");
+        var intent = new Intent("org.lshiker.manager.NOTIFICATION");
         intent.putExtra(Intent.EXTRA_INTENT, inIntent);
         intent.addFlags(0x01000000); //Intent.FLAG_RECEIVER_INCLUDE_BACKGROUND
         intent.addFlags(0x00400000); //Intent.FLAG_RECEIVER_FROM_SHELL

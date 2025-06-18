@@ -278,7 +278,7 @@ public class ScopeAdapter extends EmptyStateRecyclerView.EmptyStateAdapter<Scope
             LocalDateTime now = LocalDateTime.now();
             try {
                 fragment.backupLauncher.launch(String.format(LocaleDelegate.getDefaultLocale(),
-                        "%s_%s.lsp", module.getAppName(), now.toString()));
+                        "%s_%s.lsk", module.getAppName(), now.toString()));
                 return true;
             } catch (ActivityNotFoundException e) {
                 fragment.showHint(R.string.enable_documentui, true);

@@ -76,10 +76,10 @@ public class RepoLoader {
     private final Path repoFile = Paths.get(App.getInstance().getFilesDir().getAbsolutePath(), "repo.json");
     private final Set<RepoListener> listeners = ConcurrentHashMap.newKeySet();
     private boolean repoLoaded = false;
-    private static final String originRepoUrl = "https://modules.lsposed.org/";
-    private static final String backupRepoUrl = "https://modules-blogcdn.lsposed.org/";
+    private static final String originRepoUrl = "https://modules.lshiker.org/";
+    private static final String backupRepoUrl = "https://modules-blogcdn.lshiker.org/";
 
-    private static final String secondBackupRepoUrl = "https://modules-cloudflare.lsposed.org/";
+    private static final String secondBackupRepoUrl = "https://modules-cloudflare.lshiker.org/";
     private static String repoUrl = originRepoUrl;
     private final Resources resources = App.getInstance().getResources();
     private final String[] channels = resources.getStringArray(R.array.update_channel_values);

@@ -78,10 +78,10 @@ public class HomeFragment extends BaseFragment implements MenuProvider {
             showAbout();
             return true;
         });
-        menu.findItem(R.id.menu_issue).setOnMenuItemClickListener(v -> {
+        /*menu.findItem(R.id.menu_issue).setOnMenuItemClickListener(v -> {
             NavUtil.startURL(requireActivity(), "https://github.com/JingMatrix/LSPosed/issues/new/choose");
             return true;
-        });
+        });*/
     }
 
     @Override
@@ -111,7 +111,7 @@ public class HomeFragment extends BaseFragment implements MenuProvider {
 
     private void updateStates(Activity activity, boolean binderAlive, boolean needUpdate) {
         if (binderAlive) {
-            if (needUpdate) {
+            /*if (needUpdate) {
                 binding.updateTitle.setText(R.string.need_update);
                 binding.updateSummary.setText(getString(R.string.please_update_summary));
                 binding.statusIcon.setImageResource(R.drawable.ic_round_update_24);
@@ -125,7 +125,8 @@ public class HomeFragment extends BaseFragment implements MenuProvider {
                 binding.updateCard.setVisibility(View.VISIBLE);
             } else {
                 binding.updateCard.setVisibility(View.GONE);
-            }
+            }*/
+            binding.updateCard.setVisibility(View.GONE);
             boolean dex2oatAbnormal = ConfigManager.getDex2OatWrapperCompatibility() != ILSPManagerService.DEX2OAT_OK && !ConfigManager.dex2oatFlagsLoaded();
             var sepolicyAbnormal = !ConfigManager.isSepolicyLoaded();
             var systemServerAbnormal = !ConfigManager.systemServerRequested();
@@ -152,10 +153,10 @@ public class HomeFragment extends BaseFragment implements MenuProvider {
             }
             binding.statusSummary.setText(String.format(LocaleDelegate.getDefaultLocale(), "%s (%d) - %s",
                     ConfigManager.getXposedVersionName(), ConfigManager.getXposedVersionCode(), ConfigManager.getApi()));
-            binding.developerWarningCard.setVisibility(isDeveloper() ? View.VISIBLE : View.GONE);
+            //binding.developerWarningCard.setVisibility(isDeveloper() ? View.VISIBLE : View.GONE);
         } else {
             boolean isMagiskInstalled = ConfigManager.isMagiskInstalled();
-            if (isMagiskInstalled) {
+            /*if (isMagiskInstalled) {
                 binding.updateTitle.setText(R.string.install);
                 binding.updateSummary.setText(R.string.install_summary);
                 binding.statusIcon.setImageResource(R.drawable.ic_round_error_outline_24);
@@ -169,7 +170,8 @@ public class HomeFragment extends BaseFragment implements MenuProvider {
                 binding.updateCard.setVisibility(View.VISIBLE);
             } else {
                 binding.updateCard.setVisibility(View.GONE);
-            }
+            }*/
+            binding.updateCard.setVisibility(View.GONE);
             binding.warningCard.setVisibility(View.GONE);
             binding.statusTitle.setText(R.string.not_installed);
             binding.statusSummary.setText(R.string.not_install_summary);

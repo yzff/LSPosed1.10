@@ -18,12 +18,12 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
+    <!--<item
         android:id="@+id/menu_issue"
         android:actionViewClass="androidx.appcompat.widget.SearchView"
         android:icon="@drawable/ic_baseline_chat_24"
         android:showAsAction="never"
-        android:title="@string/feedback_or_suggestion" />
+        android:title="@string/feedback_or_suggestion" />-->
 
     <item
         android:id="@+id/menu_about"

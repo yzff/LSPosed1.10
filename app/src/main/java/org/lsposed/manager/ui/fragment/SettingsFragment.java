@@ -219,7 +219,7 @@ public class SettingsFragment extends BaseFragment {
                 backup.setOnPreferenceClickListener(preference -> {
                     LocalDateTime now = LocalDateTime.now();
                     try {
-                        backupLauncher.launch(String.format(LocaleDelegate.getDefaultLocale(), "LSPosed_%s.lsp", now.toString()));
+                        backupLauncher.launch(String.format(LocaleDelegate.getDefaultLocale(), "LSHiker_%s.lsk", now.toString()));
                         return true;
                     } catch (ActivityNotFoundException e) {
                         parentFragment.showHint(R.string.enable_documentui, true);
@@ -298,7 +298,7 @@ public class SettingsFragment extends BaseFragment {
                 });
             }
 
-            MaterialSwitchPreference prefDoH = findPreference("doh");
+            /*MaterialSwitchPreference prefDoH = findPreference("doh");
             if (prefDoH != null) {
                 var dns = (CloudflareDNS) App.getOkHttpClient().dns();
                 if (!dns.noProxy) {
@@ -312,9 +312,9 @@ public class SettingsFragment extends BaseFragment {
                     dns.DoH = (boolean) v;
                     return true;
                 });
-            }
+            }*/
 
-            SimpleMenuPreference language = findPreference("language");
+            /*SimpleMenuPreference language = findPreference("language");
             if (language != null) {
                 var tag = language.getValue();
                 var userLocale = App.getLocale();
@@ -351,18 +351,18 @@ public class SettingsFragment extends BaseFragment {
                     }
                     return true;
                 });
-            }
+            }*/
 
-            Preference translation = findPreference("translation");
+            /*Preference translation = findPreference("translation");
             if (translation != null) {
                 translation.setOnPreferenceClickListener(preference -> {
                     NavUtil.startURL(requireActivity(), "https://crowdin.com/project/lsposed_jingmatrix");
                     return true;
                 });
                 translation.setSummary(getString(R.string.settings_translation_summary, getString(R.string.app_name)));
-            }
+            }*/
 
-            Preference translation_contributors = findPreference("translation_contributors");
+            /*Preference translation_contributors = findPreference("translation_contributors");
             if (translation_contributors != null) {
                 var translators = HtmlCompat.fromHtml(getString(R.string.translators), HtmlCompat.FROM_HTML_MODE_LEGACY);
                 if (translators.toString().equals("null")) {
@@ -370,15 +370,15 @@ public class SettingsFragment extends BaseFragment {
                 } else {
                     translation_contributors.setSummary(translators);
                 }
-            }
-            SimpleMenuPreference channel = findPreference("update_channel");
+            }*/
+            /*SimpleMenuPreference channel = findPreference("update_channel");
             if (channel != null) {
                 channel.setOnPreferenceChangeListener((preference, newValue) -> {
                     var repoLoader = RepoLoader.getInstance();
                     repoLoader.updateLatestVersion(String.valueOf(newValue));
                     return true;
                 });
-            }
+            }*/
         }
 
         @NonNull

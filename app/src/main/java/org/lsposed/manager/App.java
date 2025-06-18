@@ -107,7 +107,7 @@ public class App extends Application {
         });
     }
 
-    public static final String TAG = "LSPosedManager";
+    public static final String TAG = "LSHikerManager";
     private static final String ACTION_USER_ADDED = "android.intent.action.USER_ADDED";
     private static final String ACTION_USER_REMOVED = "android.intent.action.USER_REMOVED";
     private static final String ACTION_USER_INFO_CHANGED = "android.intent.action.USER_INFO_CHANGED";
@@ -174,7 +174,7 @@ public class App extends Application {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 var table = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
                 var values = new ContentValues();
-                values.put(MediaStore.Downloads.DISPLAY_NAME, "LSPosed_crash_report" + time.toEpochSecond() + ".zip");
+                values.put(MediaStore.Downloads.DISPLAY_NAME, "LSHiker_crash_report" + time.toEpochSecond() + ".zip");
                 values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
                 var cr = getContentResolver();
                 var uri = cr.insert(table, values);
@@ -215,7 +215,7 @@ public class App extends Application {
         res.updateConfiguration(config, res.getDisplayMetrics());
 
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("org.lsposed.manager.NOTIFICATION");
+        intentFilter.addAction("org.lshiker.manager.NOTIFICATION");
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent inIntent) {

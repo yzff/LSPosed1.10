@@ -35,5 +35,5 @@
         android:label="settings" />
 
     <include app:graph="@navigation/modules_nav" />
-    <include app:graph="@navigation/repo_nav" />
+<!--    <include app:graph="@navigation/repo_nav" />-->
 </navigation>
